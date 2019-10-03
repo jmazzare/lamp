@@ -1,1 +1,1 @@
-# lamp
+# LAMP Proof of Concept
