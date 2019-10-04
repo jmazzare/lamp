@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>LAMP Proof of Concept</title>
+    <title>PHP/MySQL</title>
     <style>
       label {
         display:block;
