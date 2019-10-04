@@ -1,11 +1,17 @@
 <!doctype html>
 <html>
   <head>
-    <title>cs-401</title>
+    <title>LAMP Proof of Concept</title>
+    <style>
+      label {
+        display:block;
+        padding: 20px 10px;
+      }
+    </style>
   </head>
   <body>
-    <form action="./form-handler.php" method="GET">
-      Simple Form
+    <form action="./form-handler.php" method="POST">
+      <h1>Simple Form</h1>
       <label>
         Choose your birth year
         <select name="birth-year">
