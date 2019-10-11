@@ -80,10 +80,17 @@ function create_todo($todo) {
     return null;
 }
 
-function save_todo($todo) {
-    $sql = "UPDATE todo SET done_at = ? WHERE id = ?";
+function save_todo($todo, $fields) {
+    $setters = "";
+    $values = array();
+    foreach ($fields as $field) {
+        $setters .= " $field = ? ";
+        $values[] = $todo->$field;
+    }
+    $sql = "UPDATE todo SET $setters WHERE id = ?";
+    $values[] = $todo->id;
     $stmt = dao()->prepare($sql);
-    $stmt->execute(array($todo->done_at, $todo->id));
+    $stmt->execute($values);
     $stmt = null;
     return null;
 }

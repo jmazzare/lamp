@@ -48,7 +48,7 @@ $total = \data\get_todo_count();
         <?php foreach(\data\get_todos($page) as $todo): ?>
           <tr>
             <td><?=empty($todo->done_at) ? '&nbsp;' : '&times;' ?></td>
-            <td><?=$todo->text ?></td>
+            <td><a href="/edit.php?id=<?=$todo->id?>"><?=htmlentities($todo->text) ?></a></td>
             <td><?=$todo->created_at ?></td>
             <td><?=$todo->updated_at ?></td>
             <td><?=$todo->done_at ?></td>
@@ -58,6 +58,7 @@ $total = \data\get_todo_count();
                 <input type="hidden" name="id" value="<?=$todo->id?>" />
                 <input type="submit" value="Mark Done" />
               </form>
+            </td>
           </tr>
         <?php endforeach; ?>
         </tbody>

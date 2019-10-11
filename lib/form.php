@@ -19,7 +19,7 @@ function handle_todo_done() {
             if (@$_POST['id']) {
                 $todo = \data\get_todo($_POST['id']);
                 $todo->done_at = date("Y-m-d H:i:s");
-                \data\save_todo($todo);
+                \data\save_todo($todo, array('done_at'));
             }
             header('Location: /todos.php');
         }
@@ -36,5 +36,20 @@ function handle_todo_add() {
             }
             header('Location: /todos.php');
         }
+    }
+}
+
+function handle_todo_edit() {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (@$_POST['id'] && @$_POST['todo']) {
+            $todo = \data\get_todo($_POST['id']);
+            if ($todo) {
+                $todo->text = $_POST['todo'];
+                \data\save_todo($todo, array('text'));
+                header("Location: /edit.php?id={$todo->id}");
+                return;
+            }
+        }
+        header("Location: /todos.php");
     }
 }
