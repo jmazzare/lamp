@@ -9,6 +9,8 @@ if (\session\is_logged_in()) {
     exit();
 }
 
+$_SESSION['now'] = microtime();
+
 ?>
     <form method="POST">
       <label style="display: block;">
