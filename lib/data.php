@@ -1,6 +1,5 @@
 <?php namespace data;
 
-
 class User {
     public $name;
     public $email;
@@ -26,25 +25,28 @@ class Todo {
     }
 }
 
-function dao() {
-    static $dao;
-    if (!$dao) {
+function conn() {
+    $logger = new \logging\Logger();
+    $logger->debug('requesting the data access object');
+    static $conn;
+    if (!$conn) {
+        $logger->info('creating connection');
         try {
-            $dao = new \PDO("mysql:dbname=app;host=localhost;", "root", "");
-            //$dao = new \PDO("sqlite:" . __DIR__ . "/../my-db.sqlite3");
-            $dao->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $conn = new \PDO("mysql:dbname=app;host=localhost;", "root", "");
+            $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (Exception $e) {
-            var_dump($e);
+            $logger->warn('the conn connection failed');
+            $logger->error($e);
         }
     }
-    return $dao;
+    return $conn;
 }
 
 function get_todos($page) {
     $page = max(0, $page - 1) * 10;
     $todos = array();
     $sql = "SELECT * FROM todo LIMIT :start , 10";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     $stmt->bindValue(':start', (int) $page, \PDO::PARAM_INT);
     if ($stmt->execute()) {
         while($row = $stmt->fetch()) {
@@ -57,7 +59,7 @@ function get_todos($page) {
 
 function get_todo_count() {
     $sql = "SELECT count(*) AS total FROM todo";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     if ($stmt->execute()) {
         list($total) = $stmt->fetch();
         $stmt = null;
@@ -74,7 +76,7 @@ function get_page_count() {
 
 function create_todo($todo) {
     $sql = "INSERT INTO todo (text, created_at) VALUES (?, ?)";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     $stmt->execute(array($todo->text, $todo->created_at));
     $stmt = null;
     return null;
@@ -89,7 +91,7 @@ function save_todo($todo, $fields) {
     }
     $sql = "UPDATE todo SET $setters WHERE id = ?";
     $values[] = $todo->id;
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     $stmt->execute($values);
     $stmt = null;
     return null;
@@ -97,7 +99,7 @@ function save_todo($todo, $fields) {
 
 function get_todo($id) {
     $sql = "SELECT * FROM todo WHERE id = ?";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     if ($stmt->execute(array($id))) {
         while($row = $stmt->fetch()) {
             $todo = Todo::from_sql_row($row);
@@ -111,7 +113,7 @@ function get_todo($id) {
 
 function validate_login($email, $password) {
     $sql = "SELECT count(*) as FOUND FROM user WHERE email = ? AND password = ?";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     if ($stmt->execute(array($email, sha1($password)))) {
         list($found) = $stmt->fetch();
         $stmt = null;
@@ -123,7 +125,7 @@ function validate_login($email, $password) {
 
 function get_user($email) {
     $sql = "SELECT email, name FROM user WHERE email = ?";
-    $stmt = dao()->prepare($sql);
+    $stmt = conn()->prepare($sql);
     if ($stmt->execute(array($email))) {
         list($email, $name) = $stmt->fetch();
         $user = new User();
